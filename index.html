@@ -32,6 +32,10 @@
         background: #DDD; 
       }
       
+      button:focus {
+        outline: none;
+      }
+      
       section#calendar,
       div#day_container,
       div#month_container {
@@ -330,9 +334,11 @@
         document.querySelector(today).classList.add("current");
         dayListener();
         document.getElementById("back").addEventListener("click", function(event){
+          event.preventDefault();
           setMonth("back", calendar);
         });
         document.getElementById("forward").addEventListener("click", function(event){
+          event.preventDefault();
           setMonth("forward", calendar);
         });
         document.addEventListener("keypress", function(event){
