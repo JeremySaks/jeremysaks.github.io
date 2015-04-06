@@ -237,6 +237,7 @@
       };
 
       Calendar.prototype.padMonth = function(daysOfMonth){
+        if (arguments.length !== 1){ throw new Error("Please provide a month."); }
         var weekdays = this.names.days;
         var placeholder = { placeholder: true };
         var first = this.getDayName(daysOfMonth[0]);
@@ -257,7 +258,7 @@
       };
 
       function materializeMonth(monthNumber, calendar){
-        // checks
+        if (arguments.length !== 2){ throw new Error("Please provide a month and calendar.");}
         var days = calendar.getMonthDays(monthNumber);
         var first = days[0];
         var month = calendar.padMonth(days);
@@ -280,7 +281,7 @@
       };
 
       function setMonth(direction, calendar){
-        if (arguments.length !== 2){ throw new Error("Please provide a direction"); }
+        if (arguments.length !== 2){ throw new Error("Please provide a direction and calendar."); }
         if ((direction !== "forward") && (direction !== "back")){ throw new Error("Direction not recognized."); }
         if ( calendar.constructor.name !== "Calendar" ){ throw new Error("Not a valid calendar."); }
         var current = document.querySelector('li[data-date="15"]').getAttribute("data-month");
