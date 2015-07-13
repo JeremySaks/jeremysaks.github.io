@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Calendar</title>
+    <style type="text/css">
+      body {
+        padding: 20px;
+      }
+
+      body * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none inside none;
+      }
+
+      button {
+        width: 22px;
+        height: 22px;
+        background: #DDD;
+        color: #777;
+        border: none;
+        font-weight: bold;
+      }
+
+      button:hover {
+        cursor: pointer;
+        background: #CCC; 
+      }
+      
+      button:focus {
+        outline: none;
+      }
+      
+      section#calendar,
+      div#day_container,
+      div#month_container {
+        border: 1px solid #999;
+        text-align: center;
+      }
+      
+      section#calendar {
+        width: 600px;
+        height: 220px;
+        padding: 10px;
+        background: #DDD;
+      }
+      
+      div#day_container {
+        float: left;
+        width: 50%;
+        height: 100%;
+        background: #FFF;
+      }
+      
+      h3#day_of_week {
+        padding: 10px 0;
+        background: #CCC;
+        border-bottom: 1px solid #999;
+      }
+      
+      p#day {
+        font-size: 70px;
+        font-weight: bold;
+        height: 155px;
+        line-height: 155px;
+      }
+      
+      div#month_container {
+        float: right;
+        width: 50%;
+        height: 100%;
+        background: #FFF;
+        border-left: none;
+      }
+
+      div#month_container > h4 {
+        padding: 8px 20px;
+        line-height: 24px;
+      }
+
+      button#back {
+        float: left;
+      }
+
+      span#month_and_year {
+        color: #333;
+      }
+
+      button#forward {
+        float: right;
+      }
+
+      div#month {
+        padding: 0 10px;
+      }
+
+      ul#weekdays > li {
+        display: block;
+        float: left;
+        width: 38.2px;
+        color: red;
+      }
+
+      ul#month_content {
+        clear: both;
+      }
+
+      ul#month_content > li {
+        display: block;
+        float: left;
+        width: 38.2px;
+        height: 22px;
+        line-height: 24px;
+      }
+
+      ul#month_content > li:not(.empty){
+        cursor: pointer;
+      }
+
+      ul#month_content > li.current {
+        background: red;
+        background: #333;
+        color: #FFF;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="calendar">
+      <div id="day_container">
+        <h3 id="day_of_week"></h3>
+        <p id="day"></p>
+      </div>
+      <div id="month_container">
+        <h4>
+          <button id="back" type="button">&#60;</button>
+          <span id="month_and_year"></span>
+          <button id="forward" type="button">&#62;</button>
+        </h4>
+        <div id="month">
+          <ul id="weekdays">
+            <li>S</li>
+            <li>M</li>
+            <li>T</li>
+            <li>W</li>
+            <li>T</li>
+            <li>F</li>
+            <li>S</li>
+          </ul>
+          <ul id="month_content">
+          </ul>
+        </div>
+      </div>
+    </section>
+    <script type="text/javascript">
+      function Calendar(year){
+        var y = year || new Date().getFullYear();
+        this.names = this.names();
+        this.days = this.buildDays(y);
+        this.author = "Jeremy Saks";
+      };
+      
+      Calendar.prototype.constructor = Calendar;
+
+      Calendar.prototype.names = function(){
+        return {
+          days: [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          months: [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+          ]
+        };
+      };
+      
+      Calendar.prototype.buildDays = function(year) {
+        if (arguments.length !== 1){ throw new Error("Please provide a year."); }
+        if (typeof year !== "number"){ throw new Error("Year is not a valid number."); }
+        var dates = [];
+        var dayCount;
+        switch(year % 4){
+          case 0:
+            dayCount = 366;
+            break;
+          default:
+            dayCount = 365;
+            break;
+        }
+        for (var i = 1; i <= dayCount; i++){
+          dates.push(new Date(year, 0, i));
+        }
+        return dates;
+      };
+
+      Calendar.prototype.getMonthDays = function(month){
+        if (arguments.length !== 1){ throw new Error("Please provide a month."); }
+        if (typeof month !== "number"){ throw new Error("Month is not a valid number."); }
+        if (month < 0 || month > 11){ throw new Error ("Month is outside the valid range."); }
+        var days = this.days.filter(function(day){
+          return day.getMonth() === month;
+        });
+        return days;
+      };
+
+      Calendar.prototype.getDayName = function(date){
+        if (arguments.length !== 1){ throw new Error("Please provide a date.");}
+        if (date.constructor.name !== "Date"){ throw new Error("Please provide a valid date."); }
+        return this.names.days[date.getDay()];
+      };
+
+      Calendar.prototype.getMonthandYearString = function(date){
+        if (arguments.length !== 1){ throw new Error("Please provide a date.");}
+        if (date.constructor.name !== "Date"){ throw new Error("Please provide a valid date."); }
+        var monthNumber = date.getMonth();
+        return this.names.months[monthNumber] + " " + date.getFullYear();
+      };
+
+      Calendar.prototype.padMonth = function(daysOfMonth){
+        if (arguments.length !== 1){ throw new Error("Please provide a month."); }
+        var weekdays = this.names.days;
+        var placeholder = { placeholder: true };
+        var first = this.getDayName(daysOfMonth[0]);
+        var last = this.getDayName(daysOfMonth.slice(-1).pop());
+        var frontPadding = weekdays.indexOf(first);
+        var backPadding = 6 - weekdays.indexOf(last);
+        if (frontPadding){
+          for (var i = frontPadding; i > 0; i--){
+            daysOfMonth.splice(0, 0, placeholder);
+          }
+        }
+        if (backPadding){
+          for (var i = backPadding; i > 0; i--){
+            daysOfMonth.push(placeholder);
+          }
+        }
+        return daysOfMonth;
+      };
+
+      function materializeMonth(monthNumber, calendar){
+        if (arguments.length !== 2){ throw new Error("Please provide a month and calendar.");}
+        var days = calendar.getMonthDays(monthNumber);
+        var first = days[0];
+        var month = calendar.padMonth(days);
+        var list = document.getElementById("month_content");
+        month.forEach(function(day){
+          var item = document.createElement("li");
+          if (day.constructor.name === "Date"){
+            var date = day.getDate();
+            item.setAttribute("data-date", date);
+            item.setAttribute("data-month", day.getMonth());
+            item.setAttribute("data-weekday", calendar.getDayName(day));
+            item.textContent = date;
+          } else {
+            item.classList.add("empty");
+          }
+          list.appendChild(item);
+        });
+        document.getElementById("month_and_year").textContent = calendar.getMonthandYearString(first);
+        dayListener();
+      };
+
+      function setMonth(direction, calendar){
+        if (arguments.length !== 2){ throw new Error("Please provide a direction and calendar."); }
+        if ((direction !== "forward") && (direction !== "back")){ throw new Error("Direction not recognized."); }
+        if ( calendar.constructor.name !== "Calendar" ){ throw new Error("Not a valid calendar."); }
+        var current = document.querySelector('li[data-date="15"]').getAttribute("data-month");
+        var newMonth;
+        switch(direction){
+          case "forward":
+            newMonth = ++current;
+            break;
+          case "back":
+            newMonth = --current;
+            break;
+        }
+        if ( (newMonth < 0) || (newMonth > 11) ){ return; }
+        var el = document.getElementById("month_content");
+        while(el.firstChild){
+          el.removeChild(el.firstChild);
+        }
+        materializeMonth(newMonth, calendar);
+      };
+
+      function setDay(element){
+        var date = element.getAttribute("data-date");
+        var weekday = element.getAttribute("data-weekday");
+        if (!(date && weekday)){ return; }
+        document.getElementById("day").textContent = date;
+        document.getElementById("day_of_week").textContent = weekday;
+        var days = document.getElementById("month_content").querySelectorAll("li");
+        Array.prototype.forEach.call(days, function(day){
+          day.classList.remove("current");
+        });
+        element.classList.add("current");
+      };
+
+      function dayListener(){
+        var days = document.getElementById("month_content").querySelectorAll("li");
+        Array.prototype.forEach.call(days, function(day){
+          day.addEventListener("click", function(event){
+            var self = this;
+            setDay(self);
+          });
+        });    
+      };
+
+      function initialize(){
+        var calendar = new Calendar();
+        var date = new Date();
+        materializeMonth(date.getMonth(), calendar);
+        document.getElementById("day_of_week").textContent = calendar.getDayName(date);
+        document.getElementById("day").textContent = date.getDate();    
+        var today = 'li[data-date="' + date.getDate() + '"]';
+        document.querySelector(today).classList.add("current");
+        dayListener();
+        document.getElementById("back").addEventListener("click", function(event){
+          event.preventDefault();
+          setMonth("back", calendar);
+        });
+        document.getElementById("forward").addEventListener("click", function(event){
+          event.preventDefault();
+          setMonth("forward", calendar);
+        });
+        document.addEventListener("keypress", function(event){
+          switch(event.charCode){
+            case 49:
+              //'1' to move back
+              setMonth("back", calendar);
+              return;            
+            case 50:
+              //'2' to move forward
+              setMonth("forward", calendar);
+              return;
+            default:
+              return;
+          }
+        });
+      };
+
+      initialize();
+    </script>
+  </body>
+</html>
