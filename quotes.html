@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <title>Inspiring Quotes</title>
+    <style type='text/css'>
+      section#contents {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #b29cb1;
+        color: white;
+      }
+      p.quote {}
+      p.author {
+        font-style: italic;
+      }
+      span.attribution {
+        font-size: 0.9em;
+      }
+      span.attribution img {
+        height: 20px;
+        width: 20px;
+      }
+      span.attribution a {
+        color: #9fcc25;
+        margin-left: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <span class='attribution'>
+      <img
+        src='https://theysaidso.com/branding/theysaidso.png'
+        alt='theysaidso.com'/>
+      <a
+        href='https://theysaidso.com'
+        title='Powered by quotes from theysaidso.com'>
+        theysaidso.com
+      </a>
+    </span>
+    <section id='contents'>
+    </section>
+    <script type='text/javascript'>
+      document.addEventListener('DOMContentLoaded', function(event){
+        var endpoint = 'http://quotes.rest/qod.json';
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function(){
+          if (this.readyState !== 4) return;
+          if (this.status !== 200) return;
+          var response = JSON.parse(this.response);
+          if (!response) return;
+          var obj = response.contents.quotes[0];
+          if (!obj) return;
+          // QUOTE
+          var quote = obj.quote || 'unknown';
+          var quoteEl = document.createElement('p');
+          quoteEl.classList.add('quote');
+          var quoteText = document.createTextNode(quote);
+          quoteEl.appendChild(quoteText);
+          // AUTHOR
+          var author = obj.author || 'anonymous';
+          var authorEl = document.createElement('p');
+          authorEl.classList.add('author');
+          var authorText = document.createTextNode(author);
+          authorEl.appendChild(authorText);
+          // TO DOM
+          var contents = document.getElementById('contents');
+          contents.appendChild(quoteEl);
+          contents.appendChild(authorEl);          
+        }
+        req.open('GET', endpoint, true);
+        req.send();
+      });
+    </script>
+  </body>
+</html>
